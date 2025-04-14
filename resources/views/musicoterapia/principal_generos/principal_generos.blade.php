@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="esp">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+ <!-- Estilos -->
+ <link rel="stylesheet" href="{{ asset('css/musicoterapia.css/Header/style copy.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/musicoterapia.css/PRINCIPAL_GENEROS/style.css') }}">
+  <title>tranquilidad</title>sicoterapia/Header/style.css">
+ 
+  <style>
+    body {
+      background-image: 
+        linear-gradient(rgba(240, 230, 255, 0.85), rgba(240, 230, 255, 0.85)), 
+        url('{{ asset('image/images/fondo_principal 2 abastrato.png') }}');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+
+  <script>
+    async function includeHTML() {
+      const elements = document.querySelectorAll('[include-html]');
+      for (let el of elements) {
+        const file = el.getAttribute('include-html');
+        try {
+          const response = await fetch(file);
+          if (response.ok) {
+            el.innerHTML = await response.text();
+            if (file.includes("header.html")) {
+              const script = document.createElement("script");
+              script.src = "/rutinas-de-ejercicios/includes/Header/script.js";
+              document.body.appendChild(script);
+            }
+          } else {
+            el.innerHTML = "<p>Error al cargar el contenido.</p>";
+          }
+        } catch (error) {
+          el.innerHTML = "<p>Error de conexión al cargar el contenido.</p>";
+        }
+      }
+    }
+    document.addEventListener("DOMContentLoaded", includeHTML);
+  </script>
+</head>
+
+<body>
+  @include('musicoterapia.Header.header')
+  <div class="container">
+    <aside class="sidebar">
+      <br /><br /><br>
+      <div class="menu-item {{ request()->routeIs('generos') ? 'active' : '' }}">
+        <a href="{{ route('generos') }}">
+          <img src="{{ asset('image/images/genero.png') }}" alt="Icon" />
+          <span>Géneros</span>
+        </a>
+      </div>
+      <div class="menu-item {{ request()->routeIs('album') ? 'active' : '' }}">
+        <a href="{{ route('album') }}">
+          <img src="{{ asset('image/images/album.png') }}" alt="Icon" />
+          <span>Álbum</span>
+        </a>
+      </div>
+      <div class="menu-item {{ request()->routeIs('podcast') ? 'active' : '' }}">
+        <a href="{{ route('podcast') }}">
+          <img src="{{ asset('image/images/pod.png') }}" alt="Icon" />
+          <span>Podcast</span>
+        </a>
+      </div>
+      <div class="menu-item {{ request()->routeIs('binaurales') ? 'active' : '' }}">
+        <a href="{{ route('binaurales') }}">
+          <img src="{{ asset('image/images/binaural.png') }}" alt="Icon" />
+          <span>Sonidos Binaurales</span>
+        </a>
+      </div>
+      <div class="menu-item {{ request()->routeIs('playlist') ? 'active' : '' }}">
+        <a href="{{ route('playlist') }}">
+          <img src="{{ asset('image/images/playL.png') }}" alt="Icon" />
+          <span>PlayList</span>
+        </a>
+      </div>
+      <div class="menu-item {{ request()->routeIs('me-gusta') ? 'active' : '' }}">
+        <a href="{{ route('me-gusta') }}">
+          <img src="{{ asset('image/images/like.png') }}" alt="Icon" />
+          <span>Me gusta</span>
+        </a>
+      </div>
+      <div class="menu-item {{ request()->routeIs('buscar') ? 'active' : '' }}">
+        <a href="{{ route('buscar') }}">
+          <img src="{{ asset('image/images/buscar boton.png') }}" alt="Icon" />
+          <span>Buscar</span>
+        </a>
+      </div>
+    </aside>
+    <main class="main-content">
+      <div class="title">
+        <br><br>
+        <span>Géneros</span>
+      </div>
+      <br>
+      <div class="genres">
+        <div class="genre" data-genre-id="1">
+          <a href="{{ route('reproductor-genero1') }}"
+            class="genre-link">
+            <div class="genre-card">
+              <img src="{{ asset('image/images/CLASICA 4.png') }}"alt="Clásica" loading="lazy"
+                onerror="this.style.display='none'; this.parentElement.innerHTML += '<div class=\'image-placeholder\'>Image Not Available</div>';" />
+              <div class="genre-card-content">
+                <h3>Clásica</h3>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="genre" data-genre-id="2">
+         <a href="{{ route('reproductor-genero2') }}"
+            class="genre-link">
+            <div class="genre-card">
+              <img src="{{ asset('image/images/AMBIENTAL 1.jpg') }}" alt="Ambiental" loading="lazy"
+                onerror="this.style.display='none'; this.parentElement.innerHTML += '<div class=\'image-placeholder\'>Image Not Available</div>';" />
+              <div class="genre-card-content">
+                <h3>Ambiental</h3>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="genre" data-genre-id="3">
+          <a href="{{ route('reproductor-genero5') }}"
+            class="genre-link">
+            <div class="genre-card">
+              <img src="{{ asset('image/images/INTRUMENTAL-1.png') }}" alt="Instrumental" loading="lazy"
+                onerror="this.style.display='none'; this.parentElement.innerHTML += '<div class=\'image-placeholder\'>Image Not Available</div>';" />
+              <div class="genre-card-content">
+                <h3>Instrumental</h3>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="genre" data-genre-id="4">
+          <a href="{{ route('reproductor-genero4') }}"
+            class="genre-link">
+            <div class="genre-card">
+              <img src="{{ asset('image/images/ELECTRONICA.jpg') }}" alt="Electrónica" loading="lazy"
+                onerror="this.style.display='none'; this.parentElement.innerHTML += '<div class=\'image-placeholder\'>Image Not Available</div>';" />
+              <div class="genre-card-content">
+                <h3>Electrónica</h3>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </main>
+  </div>
+  <br><br><br><br>
+  @include('musicoterapia.Fotter.inicio.footer')
+
+  <script src="{{ asset('js/musicoterapia.js/PRINCIPAL_GENEROS/scrip.js') }}"></script>
+  <script>
+    /  // Función para cargar el contenido de la plantilla de los géneros
+  document.addEventListener('DOMContentLoaded', () => {
+    const genreLinks = document.querySelectorAll('.genre-link');
+    genreLinks.forEach(link => {
+      link.addEventListener('click', (event) => {
+        event.preventDefault(); // Evita la navegación inmediata
+        const genreId = link.parentElement.getAttribute('data-genre-id');
+        const href = link.getAttribute('href');
+        // Redirigir con el genre_id como parámetro en la URL
+        window.location.href = `${href}?genre_id=${genreId}`;
+      });
+    });
+  });
+
+  </script>
+</body>
+
+</html>
+
+<!-- <!DOCTYPE html>
+<html lang="esp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="/musicoterapia/Header/style.css">
+    <link rel="stylesheet" href="style.css">
+    
+    <title>tranquilidad</title>
+    <script>
+      async function includeHTML() {
+          const elements = document.querySelectorAll('[include-html]');
+          for (let el of elements) {
+              const file = el.getAttribute('include-html');
+              try {
+                  const response = await fetch(file);
+                  if (response.ok) {
+                      el.innerHTML = await response.text();
+                      // Cargar el JS del footer después de insertarlo
+                      if (file.includes("header.html")) {
+                          const script = document.createElement("script");
+                          script.src = "/rutinas-de-ejercicios/includes/Header/script.js";
+                          document.body.appendChild(script);
+                      }
+                  } else {
+                      el.innerHTML = "<p>Error al cargar el contenido.</p>";
+                  }
+              } catch (error) {
+                  el.innerHTML = "<p>Error de conexión al cargar el contenido.</p>";
+              }
+          }
+      }
+      document.addEventListener("DOMContentLoaded", includeHTML);
+  </script>
+
+
+</head>
+<body>
+    <div include-html="/rutinas-de-ejercicios/includes/Header/header.html"></div>
+  <div class="container">
+    <aside class="sidebar">
+      <br />
+      <br />
+      <br>
+      <div class="menu-item active">
+        <a href="/musicoterapia/Vistas1.1/PRINCIPAL_GENEROS/principal_generos.html" style="text-decoration: none">
+          <img src="/musicoterapia/Vistas1.1/images/genero.png" alt="Icon" />
+          <span>Géneros</span>
+        </a>
+      </div>
+      <div class="menu-item">
+        <a href="/musicoterapia/Vistas1.1/PRINCIPAL_ALBUM/principal_album.html" style="text-decoration: none">
+          <img src="/musicoterapia/Vistas1.1/images/album.png" alt="Icon" />
+          <span>Álbum</span>
+        </a>
+      </div>
+      <div class="menu-item">
+        <a href="/musicoterapia/Vistas1.1/PRINCIPAL_PODCAST/principal_podcast.html" style="text-decoration: none">
+          <img src="/musicoterapia/Vistas1.1/images/pod.png" alt="Icon" />
+          <span>Podcast</span>
+        </a>
+      </div>
+
+      <div class="menu-item">
+        <a href="/musicoterapia/Vistas1.1/SONIDOS_BINAURALES/binaurales.html" style="text-decoration: none">
+          <img src="/musicoterapia/Vistas1.1/images/binaural.png" alt="Icon" />
+          <span>Sonidos Binaurales</span>
+        </a>
+      </div>
+      <div class="menu-item">
+        <a href="/musicoterapia/Vistas1.1/PLAYLIST/playList.html" style="text-decoration: none">
+          <img src="/musicoterapia/Vistas1.1/images/playL.png" alt="Icon" />
+          <span>PlayList</span>
+        </a>
+      </div>
+      <div class="menu-item">
+        <a href="/musicoterapia/Vistas1.1/ME GUSTA/Tus me gustas pistas.html" style="text-decoration: none">
+          <img src="/musicoterapia/Vistas1.1/images/like.png" alt="Icon" />
+          <span>Me gusta</span>
+        </a>
+      </div>
+      <div class="menu-item">
+        <a href="/musicoterapia/Vistas1.1/PRINCIPAL BUSCAR/buscar.html" style="text-decoration: none">
+          <img src="/musicoterapia/Vistas1.1/images/buscar boton.png" alt="Icon" />
+          <span>Buscar</span>
+        </a>
+      </div>
+    </aside>
+
+
+    <main class="main-content">
+      <div class="title">
+          <br>
+          <br>
+          <span>Géneros</span>
+      </div>
+      <br>
+      <div class="genres">
+          <div class="genre">
+              <a href="/musicoterapia/Vistas1.1/REPRODUCCTORES/GENERO_ELEGIDO/CLASICA/genero_elegido1.html">
+                  <div class="genre-card">
+                      <img src="/musicoterapia/Vistas1.1/images/CLASICA 4.png" 
+                           alt="Clásica" 
+                           loading="lazy"
+                           onerror="this.style.display='none'; this.parentElement.innerHTML += '<div class=\'image-placeholder\'>Image Not Available</div>';"/>
+                      <div class="genre-card-content">
+                          <h3>Clásica</h3>
+                      </div>
+                  </div>
+              </a>
+          </div>
+          <div class="genre">
+              <a href="/musicoterapia/Vistas1.1/REPRODUCCTORES/GENERO_ELEGIDO/AMBIENTAL/genero_elegido2.html">
+                  <div class="genre-card">
+                      <img src="/musicoterapia/Vistas1.1/images/AMBIENTAL 1.jpg" 
+                           alt="Ambiental" 
+                           loading="lazy"
+                           onerror="this.style.display='none'; this.parentElement.innerHTML += '<div class=\'image-placeholder\'>Image Not Available</div>';"/>
+                      <div class="genre-card-content">
+                          <h3>Ambiental</h3>
+                      </div>
+                  </div>
+              </a>
+          </div>
+          <div class="genre">
+              <a href="/musicoterapia/Vistas1.1/REPRODUCCTORES/GENERO_ELEGIDO/INSTRUMENTAL/genero_elegido5.html">
+                  <div class="genre-card">
+                      <img src="/musicoterapia/Vistas1.1/images/INTRUMENTAL-1.png" 
+                           alt="Instrumental" 
+                           loading="lazy"
+                           onerror="this.style.display='none'; this.parentElement.innerHTML += '<div class=\'image-placeholder\'>Image Not Available</div>';"/>
+                      <div class="genre-card-content">
+                          <h3>Instrumental</h3>
+                      </div>
+                  </div>
+              </a>
+          </div>
+          <div class="genre">
+              <a href="/musicoterapia/Vistas1.1/REPRODUCCTORES/GENERO_ELEGIDO/ELECTRONICA/genero_elegido4.html">
+                  <div class="genre-card">
+                      <img src="/musicoterapia/Vistas1.1/images/ELECTRONICA.jpg" 
+                           alt="Electronica" 
+                           loading="lazy"
+                           onerror="this.style.display='none'; this.parentElement.innerHTML += '<div class=\'image-placeholder\'>Image Not Available</div>';"/>
+                      <div class="genre-card-content">
+                          <h3>Electrónica</h3>
+                      </div>
+                  </div>
+              </a>
+          </div>
+      </div>
+  </main>
+    
+    </div>
+    <br>
+    <br>
+    <br>
+    <br>
+<div include-html="/rutinas-de-ejercicios/includes/inicio/inicio.html"></div>
+
+</script>
+</body>
+</html> -->
