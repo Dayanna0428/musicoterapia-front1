@@ -170,7 +170,6 @@
   <br>
   <br>
   <br>
-  <br>
   @include('musicoterapia.Fotter.inicio.footer')
     
   <script src="{{ asset('js/musicoterapia.js/REPRODUCCTORES/GENERO_ELEGIDO/CLASICA/script.js') }}"></script>
