@@ -114,7 +114,7 @@
       <br>
       <div class="genres">
         <div class="genre">
-          <a href="{{ route('reproductor-album3', ['album_id' => 1]) }}">
+          <a href="{{ route('reproductor-album1', ['album_id' => 1]) }}">
             <div class="genre-card">
               <img src="{{ asset('image/images/DORMIR-2.png') }}" alt="Clásica" loading="lazy" />
               <div class="genre-card-content">
