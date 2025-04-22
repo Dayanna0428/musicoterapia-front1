@@ -19,8 +19,8 @@
 
   <style>
     body {
-      background-image: 
-        linear-gradient(rgba(240, 230, 255, 0.85), rgba(240, 230, 255, 0.85)), 
+      background-image:
+        linear-gradient(rgba(240, 230, 255, 0.85), rgba(240, 230, 255, 0.85)),
         url('{{ asset('image/images/fondo_principal 2 abastrato.png') }}');
       background-size: cover;
       background-position: center;
@@ -109,70 +109,17 @@
     </aside>
 
     <main class="main-content">
-      <div class="title">
-        <span>Podcast</span><br><br>
-      </div>
+        <div class="title">
+          <span>Podcast</span>
+        </div>
 
-      <div class="genres">
-        {{-- Tarjeta 1 --}}
-        <div class="genre">
-          <div class="genre-card">
-           <a href="{{ route('reproductor-podcast1') }}">
-              <img src="{{ asset('image/images/podcast1.jpg') }}" alt="Afirmaciones" loading="lazy"
-                onerror="this.style.display='none'; this.parentElement.innerHTML += '<div class=\'image-placeholder\'>Image Not Available</div>';" />
-              <div class="genre-card-content">
-                <h3>Afirmaciones</h3>
-              </div>
-            </a>
+        <div class="podcasts-container" id="podcasts-container">
+          <div class="loading">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Cargando podcasts...</p>
           </div>
         </div>
-       
-        {{-- Tarjeta 2 --}}
-        <div class="genre">
-          <div class="genre-card">
-          <a href="{{ route('reproductor-podcast2') }}">
-            <a href="/musicoterapia/Vistas1.1/REPRODUCCTORES/REPRO_PODCAST/AUTOESTIMA/Reproductorpodcast2.html">
-              <img src="{{ asset('image/images/Podcast2.png') }}" alt="Autoestima" loading="lazy"
-                onerror="this.style.display='none'; this.parentElement.innerHTML += '<div class=\'image-placeholder\'>Image Not Available</div>';" />
-              <div class="genre-card-content">
-                <h3>Autoestima</h3>
-              </div>
-            </a>
-          </div>
-        </div>
-      
-        {{-- Tarjeta 3 --}}
-        <div class="genre">
-          <div class="genre-card">
-            <a href="{{ route('reproductor-podcast3') }}">
-              <img src="{{ asset('image/images/PODCAST 2.jpg') }}" alt="Motivación" loading="lazy"
-                onerror="this.style.display='none'; this.parentElement.innerHTML += '<div class=\'image-placeholder\'>Image Not Available</div>';" />
-              <div class="genre-card-content">
-                <h3>Motivación</h3>
-              </div>
-            </a>
-          </div>
-        </div>
-     
-        {{-- Tarjeta 4 --}}
-        <div class="genre">
-          <div class="genre-card">
-            <a href="/musicoterapia/Vistas1.1/REPRODUCCTORES/REPRO_PODCAST/Reproductorpodcast.html?podcastId=4">
-              <img src="{{ asset('image/images/PODCASTS 1.jpg') }}" alt="Electrónica" loading="lazy"
-                onerror="this.style.display='none'; this.parentElement.innerHTML += '<div class=\'image-placeholder\'>Image Not Available</div>';" />
-              <div class="genre-card-content">
-                {{-- Puedes agregar texto si quieres --}}
-              </div>
-            </a>
-            <a href="{{ route('estudio') }}" class="boton-enlace">
-              <button class="add-button">
-                <i class="material-icons">add</i>
-              </button>
-            </a>
-          </div>
-        </div>
-      </div>
-    </main>
+      </main>
   </div>
 
   <br><br><br><br>
@@ -180,8 +127,137 @@
   {{-- Footer --}}
   @include('musicoterapia.Fotter.inicio.footer')
 
-  {{-- Scripts --}}
-  <script src="{{ asset('js/musicoterapia.js/PRINCIPAL_PODCAST/script.js') }}"></script>
+  <script src="{{ asset('js/api.js') }}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const api = new API();
+      const container = document.getElementById('podcasts-container');
+      const defaultImage = "{{ asset('image/images/default-podcast.png') }}";
+
+      try {
+        const response = await api.getAllPodcasts();
+        const podcasts = response.data;
+
+        if (podcasts.length === 0) {
+          container.innerHTML = '<p class="empty">No se encontraron podcasts</p>';
+          return;
+        }
+
+        container.innerHTML = `
+          <div class="podcasts-grid">
+            ${podcasts.map(podcast => `
+              <a href="/podcast/${podcast.id}" class="podcast-card">
+                <div class="podcast-image">
+                  <img src="${podcast.image_url || defaultImage}"
+                       alt="${podcast.title}"
+                       onerror="this.src='${defaultImage}'">
+                </div>
+                <div class="podcast-info">
+                  <h3>${podcast.title}</h3>
+                  ${podcast.description ? `<p>${podcast.description}</p>` : ''}
+                  <div class="podcast-meta">
+                    <span><i class="fas fa-headphones"></i> ${podcast.episodes_count} episodios</span>
+                    <span><i class="fas fa-clock"></i> ${podcast.duration} min</span>
+                  </div>
+                </div>
+              </a>
+            `).join('')}
+          </div>
+        `;
+
+      } catch (error) {
+        console.error('Error:', error);
+        container.innerHTML = `
+          <div class="error">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>Error cargando podcasts</p>
+          </div>
+        `;
+      }
+    });
+  </script>
+
+<style>
+    .podcasts-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 columnas en cada fila */
+  gap: 1.5rem; /* Espacio entre los elementos */
+  padding: 1.5rem;
+}
+
+@media (max-width: 1200px) {
+  .podcasts-grid {
+    grid-template-columns: repeat(3, 1fr); /* 3 columnas en pantallas más pequeñas */
+  }
+}
+
+@media (max-width: 900px) {
+  .podcasts-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 columnas en pantallas más pequeñas */
+  }
+}
+
+@media (max-width: 600px) {
+  .podcasts-grid {
+    grid-template-columns: 1fr; /* 1 columna en pantallas muy pequeñas */
+  }
+}
+
+    .podcast-card {
+      display: flex;
+      flex-direction: column;
+      background-color: #ffffffcc;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      text-decoration: none;
+      color: #333;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      max-width: 220px;
+      margin: auto;
+    }
+
+    .podcast-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .podcast-image img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .podcast-info {
+      padding: 0.8rem;
+    }
+
+    .podcast-info h3 {
+      margin: 0 0 0.5rem;
+      font-size: 1.1rem;
+      color: #4a3c8c;
+    }
+
+    .podcast-info p {
+      font-size: 0.9rem;
+      color: #555;
+      margin-bottom: 0.6rem;
+    }
+
+    .podcast-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: #777;
+    }
+
+    .podcast-meta i {
+      margin-right: 5px;
+    }
+  </style>
+
+
 </body>
 
 </html>

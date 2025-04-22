@@ -5,6 +5,40 @@
 }
 
 
+    .binaural-track {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9f9f9;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.track-info {
+  flex: 1;
+}
+
+.play-binaural {
+  background-color: #4f46e5; /* Indigo */
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.play-binaural:hover {
+  background-color: #4338ca;
+  transform: translateY(-2px);
+}
+
+.play-binaural:active {
+  transform: scale(0.97);
+}
 
 
 
@@ -63,7 +97,7 @@ body {
   justify-content: center;
   padding-bottom: 20px;
   margin-top: -66px;
-  
+
 
 }
 
@@ -118,7 +152,7 @@ a {
   margin-top: 80px;
   margin-bottom: -80px;
   z-index: 2;
-  
+
 }
 
 .part1 {
@@ -189,9 +223,9 @@ a {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  
- 
- 
+
+
+
 }
 
 /* Ajuste del título dentro de main-content */
@@ -214,24 +248,24 @@ a {
       border: 2px solid #59009A;
       box-sizing: border-box;
   }
-     
+
   .sidebar .menu-item {
       padding: 8px; /* Reducido de 10px a 8px */
       margin: 6px 0; /* Menos espacio entre elementos */
       font-size: 14px; /* Disminuir el tamaño del texto */
   }
-  
+
   .sidebar .menu-item img {
       width: 20px; /* Reducido de 24px a 20px */
       height: 20px;
       margin-right: 8px;
   }
-  
+
   .sidebar .menu-item span {
       font-size: 14px; /* Ajuste para que se vea proporcionado */
   }
 }
-  
+
   @media only screen and (max-width: 768px) {
       .container {
       flex-direction: column;
@@ -249,7 +283,7 @@ a {
     margin: 0 auto;
     max-width: 95%;
   }
-          
+
           .genres {
               width: 100%;
               justify-content: center;
@@ -279,7 +313,7 @@ a {
  .genre-card img {
   height: auto; /* Mantiene proporciones */
   max-height: 230px; /* Para evitar que se estiren */
-  
+
 }
 
 @media only screen and (max-width: 768px) {
@@ -379,8 +413,8 @@ a {
   margin-top: 10px; /* Ajusta el valor según la separación deseada */
 
   }
-    
-  
+
+
     /* Estilos generales de cada pista */
     .track {
       display: flex;
@@ -389,24 +423,24 @@ a {
       padding: 10px;
       border-bottom: 1px solid #ccc;
     }
-  
+
     /* Elimina el borde inferior de la última pista */
     .track:last-child {
       border-bottom: none;
     }
-  
+
     /* Estilos de las imágenes de las pistas */
     .track img {
       height: 50px;
       width: 50px;
       border-radius: 5px;
     }
-  
+
     /* Estilos de los divs dentro de cada pista */
     .track div {
       padding: 0 20px;
     }
-  
+
     /* Estilos de los enlaces de los botones de reproducción */
     .track a.play-button {
       background: white;
@@ -422,7 +456,7 @@ a {
       position: relative;
       color: black;
     }
-  
+
     /* Estilos del triángulo dentro del botón de reproducción */
     .track a.play-button::before {
       content: '';
@@ -434,8 +468,8 @@ a {
       position: absolute;
       left: 13px;
     }
-  
-   
+
+
   /* ------------------------------------------------------------- */
   /* Estilos del contenedor principal */
   .container {
@@ -511,7 +545,7 @@ a {
     }
   }
   @media only screen and (max-width: 768px) {
-    .corner-text, 
+    .corner-text,
     .bottom-left-text {
         font-size: 22px; /* Aumenté el tamaño */
         max-width: 90%; /* Más espacio para evitar desbordes */

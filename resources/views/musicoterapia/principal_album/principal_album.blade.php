@@ -18,8 +18,8 @@
 
   <style>
     body {
-      background-image: 
-        linear-gradient(rgba(240, 230, 255, 0.85), rgba(240, 230, 255, 0.85)), 
+      background-image:
+        linear-gradient(rgba(240, 230, 255, 0.85), rgba(240, 230, 255, 0.85)),
         url('{{ asset('image/images/fondo_principal 2 abastrato.png') }}');
       background-size: cover;
       background-position: center;
@@ -58,7 +58,7 @@
 
 <body>
   @include('musicoterapia.Header.header')
-  
+
   <div class="container">
     <aside class="sidebar">
       <br><br>
@@ -107,63 +107,64 @@
     </aside>
 
     <main class="main-content">
-      <div class="title">
-        <br><br><br><br>
-        <span>Albums</span>
-      </div>
-      <br>
-      <div class="genres">
-        <div class="genre">
-          <a href="{{ route('reproductor-album1', ['album_id' => 1]) }}">
-            <div class="genre-card">
-              <img src="{{ asset('image/images/DORMIR-2.png') }}" alt="Clásica" loading="lazy" />
-              <div class="genre-card-content">
-                <h3>Dormir</h3>
-              </div>
-            </div>
-          </a>
+        <div class="title">
+          <br><br>
+          <span>Albums</span>
         </div>
-
-        <div class="genre">
-          <a href="{{ route('reproductor-album2', ['album_id' => 2]) }}">
-            <div class="genre-card">
-              <img src="{{ asset('image/images/RELAJACION UNO.png') }}" alt="Ambiental" loading="lazy" />
-              <div class="genre-card-content">
-                <h3>Relajarse</h3>
-              </div>
-            </div>
-          </a>
+        <br>
+        <div class="genres" id="albums-container">
+          <!-- Álbumes se cargarán aquí dinámicamente -->
         </div>
-
-        <div class="genre">
-          <a href="{{ route('reproductor-album3', ['album_id' => 3]) }}">
-            <div class="genre-card">
-              <img src="{{ asset('image/images/CONCENTRASE.png') }}" alt="Instrumental" loading="lazy" />
-              <div class="genre-card-content">
-                <h3>Concentrarse</h3>
-              </div>
-            </div>
-          </a>
-        </div>
-
-        <div class="genre">
-          <a href="{{ route('reproductor-album4', ['album_id' => 2]) }}">
-            <div class="genre-card">
-              <img src="{{ asset('image/images/GAMER 2.webp') }}" alt="Electronica" loading="lazy" />
-              <div class="genre-card-content">
-                <h3>Gamer</h3>
-              </div>
-            </div>
-          </a>
-        </div>
-      </div>
-    </main>
+      </main>
   </div>
 
   <br><br><br><br>
 
   @include('musicoterapia.Fotter.inicio.footer')
 
-  <script src="{{ asset('js/musicoterapia.js/PRINCIPAL_ALBUM/scrip.js') }}"></script>
+  <script src="{{ asset('js/api.js') }}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const api = new API();
+      const albumsContainer = document.getElementById('albums-container');
+
+      try {
+        // Obtener álbumes desde la API
+        const { data: albums } = await api.getAllAlbums();
+
+        // Generar HTML dinámico
+        albumsContainer.innerHTML = albums.map(album => `
+          <div class="genre" data-album-id="${album.id}">
+            <a href="/reproductor-album/${album.id}" class="album-link">
+              <div class="genre-card">
+                ${album.image_path ? `
+                  <img src="${album.image_path}" alt="${album.title}"
+                       class="genre-image"
+                       onerror="this.onerror=null; this.src='{{ asset('image/images/default-album.png') }}'">
+                ` : `
+                  <div class="image-placeholder">
+                    <i class="fas fa-compact-disc"></i>
+                  </div>
+                `}
+                <div class="genre-card-content">
+                  <h3>${album.title}</h3>
+                  ${album.release_date ? `<p>${new Date(album.release_date).getFullYear()}</p>` : ''}
+                </div>
+              </div>
+            </a>
+          </div>
+        `).join('');
+
+      } catch (error) {
+        console.error('Error cargando álbumes:', error);
+        albumsContainer.innerHTML = `
+          <div class="error-message">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>Error al cargar los álbumes</p>
+          </div>
+        `;
+      }
+    });
+  </script>
 </body>
 </html>

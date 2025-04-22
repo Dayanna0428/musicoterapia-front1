@@ -16,8 +16,8 @@
 
   <style>
     body {
-      background-image: 
-        linear-gradient(rgba(240, 230, 255, 0.85), rgba(240, 230, 255, 0.85)), 
+      background-image:
+        linear-gradient(rgba(240, 230, 255, 0.85), rgba(240, 230, 255, 0.85)),
         url('{{ asset('image/images/fondo_principal 2 abastrato.png') }}');
       background-size: cover;
       background-position: center;
@@ -107,27 +107,31 @@
       </div>
     </aside>
 
-    <main class="main-content">
-      <div class="title">
-        <span>Sonidos Binaurales</span>
-      </div>
-      <br><br>
-      <div class="image-container" style="position: relative;">
-        <img src="{{ asset('image/imgBin/1.png') }}" alt="Fondo de ondas binaurales" />
-        <div class="corner-text">ACTIVA TU CEREBRO</div>
-        <div class="bottom-left-text">
-          ONDAS GAMMA BINAURALES: Rendimiento Mental, Concentración y Memoria
+    <main class="main-content" style="max-width: 1200px; margin: 0 auto;">
+        <div class="title">
+          <span>Sonidos Binaurales</span>
         </div>
-      </div>
+        <br><br>
 
-      <div class="image-container2">
-        <div class="content">
-          <div class="tracks-container" id="tracks-container">
-            <p>Cargando audios binaurales...</p>
+        <!-- Sección informativa -->
+        <div class="image-container" style="position: relative;">
+          <img src="{{ asset('image/imgBin/1.png') }}" alt="Fondo de ondas binaurales"
+               style="width: 100%; height: auto; max-height: 500px; object-fit: cover;" />
+          <div class="corner-text">ACTIVA TU CEREBRO</div>
+          <div class="bottom-left-text">
+            ONDAS GAMMA BINAURALES: Rendimiento Mental, Concentración y Memoria
           </div>
         </div>
-      </div>
-    </main>
+
+        <!-- Lista de audios binaurales -->
+        <div class="image-container2">
+          <div class="content">
+            <div class="tracks-container" id="binaural-tracks">
+              <!-- Los audios se cargarán aquí -->
+            </div>
+          </div>
+        </div>
+      </main>
   </div>
 
   <br><br><br><br>
@@ -135,10 +139,80 @@
   {{-- Footer --}}
   @include('musicoterapia.Fotter.inicio.footer')
 
-  <script src="{{ asset('js/musicoterapia.js/SONIDOS_BINAURALES/script.js') }}"></script>
+  <script src="{{ asset('js/api.js') }}"></script>
+
   <script>
-    const reproductorBinauralUrl = "{{ route('reproductor-binaural') }}";
+    document.addEventListener('DOMContentLoaded', async () => {
+      const api = new API();
+      const container = document.getElementById('binaural-tracks');
+
+      try {
+        // 1. Obtener todos los audios
+        const response = await api.getAllAudios();
+        console.log('Respuesta completa de la API:', response);
+
+        // 2. Verificar estructura de datos
+        if (!response.data || !Array.isArray(response.data)) {
+          throw new Error('Formato de datos inválido de la API');
+        }
+
+        // 3. Depurar valores de es_binaural
+        const allAudios = response.data;
+        console.log('Todos los audios:', allAudios);
+
+        // 4. Filtrar audios binaurales con verificación
+        const binauralAudios = allAudios.filter(audio => {
+          console.log(`Audio ID: ${audio.id}, es_binaural: ${audio.es_binaural} (tipo: ${typeof audio.es_binaural})`);
+          return Boolean(audio.es_binaural); // Convierte a booleano explícitamente
+        });
+
+        console.log('Audios binaurales filtrados:', binauralAudios);
+
+        if (binauralAudios.length === 0) {
+          container.innerHTML = '<p>No se encontraron audios binaurales</p>';
+          return;
+        }
+
+        // 5. Generar HTML con más detalles
+        container.innerHTML = binauralAudios.map(audio => `
+          <div class="binaural-track">
+            <div class="track-info">
+              <h3>${audio.title}</h3>
+              ${audio.description ? `<p class="description">${audio.description}</p>` : ''}
+              <div class="metadata">
+                <p>Duración: ${formatDuration(audio.duration)}</p>
+                ${audio.frecuencia ? `<p>Frecuencia: ${audio.frecuencia}Hz</p>` : ''}
+                <p>Tipo: ${audio.es_binaural ? 'Binaural' : 'Regular'}</p>
+              </div>
+            </div>
+           <button class="play-binaural" data-audio-id="${audio.id}">
+                Reproducir
+            </button>
+          </div>
+        `).join('');
+
+        // 6. Agregar eventos de clic
+        document.querySelectorAll('.play-binaural').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const audioId = btn.dataset.audioId;
+            window.location.href = `/reproductor-binaural/${audioId}`;
+          });
+        });
+
+      } catch (error) {
+        console.error('Error:', error);
+        container.innerHTML = `<p class="error">Error cargando audios: ${error.message}</p>`;
+      }
+
+      function formatDuration(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${minutes}:${secs.toString().padStart(2, '0')}`;
+      }
+    });
 </script>
+
+
 
 </body>
 </html>

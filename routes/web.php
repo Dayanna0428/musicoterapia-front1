@@ -3,14 +3,13 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('musicoterapia.principal_generos.principal_generos');
 });
 
-// RUTAS INICIO
+// // RUTAS INICIO
 Route::get('/login', function () {
     return view('musicoterapia.modulo-iniciar-sesion.login.login');
 })->name('login');
-
 Route::get('/mensaje', function () {
     return view('musicoterapia.modulo-iniciar-sesion.mensajes.recuperarContraseña2');
 })->name('mensaje');
@@ -19,6 +18,90 @@ Route::get('/registro', function () {
     return view('musicoterapia.modulo-iniciar-sesion.registro.registro');
 })->name('registro');
 
+
+
+
+
+Route::get('/reproductor-genero/{id}', function ($id) {
+    return view('musicoterapia.reproducctores.genero_elegido.showGenero', [
+        'genre_id' => $id
+    ]);
+})->name('reproductor-genero');
+
+Route::get('/reproductor-album/{id}', function ($id) {
+    return view('musicoterapia.reproducctores.album_elegido.showAlbum', [
+        'album_id' => $id
+    ]);
+})->name('album.show');
+
+Route::get('/reproductor-binaural/{id}', function ($id) {
+    return view('musicoterapia.reproducctores.repro_binaurales.Reproducctor2', [
+        'audio_id' => $id
+    ]);
+})->name('reproductor-binaural');
+
+Route::get('/podcast/{id}', function ($id) {
+    return view('musicoterapia.reproducctores.repro_podcasts.Reproductorpodcast', [
+        'podcast_id' => $id
+    ]);
+})->name('podcast.show');
+
+Route::get('/playlists/{id}', function ($id) {
+    return view('musicoterapia.reproducctores.repro_pistas.Reproductor_pistas', [
+        'playlist_id' => $id
+    ]);
+})->name('playlist.show');
+
+Route::get('/favoritos', function () {
+    return view('musicoterapia.megusta.megusta');
+})->name('favoritos');
+
+
+
+
+// Route::get('/binaurales', function () {
+//     return view('musicoterapia.binaurales.index');
+// })->name('binaurales');
+// Route::get('/podcasts', function () {
+//     return view('musicoterapia.podcasts.index');
+// })->name('podcasts');
+
+
+// Route::get('/reproductor-genero', function () {
+//     return view('musicoterapia.reproducctores.genero_elegido.genero_elegido');
+// })->name('reproductor-genero');
+
+// Route::get('/reproductor-genero1', function () {
+//     return view('musicoterapia.reproducctores.genero_elegido.clasica.genero_elegido1');
+// })->name('reproductor-genero1');
+// Route::get('/reproductor-genero2', function () {
+//     return view('musicoterapia.reproducctores.genero_elegido.ambiental.genero_elegido2');
+// })->name('reproductor-genero2');
+// Route::get('/reproductor-genero4', function () {
+//     return view('musicoterapia.reproducctores.genero_elegido.electronica.genero_elegido4');
+// })->name('reproductor-genero4');
+// Route::get('/reproductor-genero5', function () {
+//     return view('musicoterapia.reproducctores.genero_elegido.instrumental.genero_elegido5');
+// // RUTAS REPRODUCTORES
+// //  REPRODUCCTORES ALBUM
+// Route::get('/reproductor-album', function () {
+//     return view('musicoterapia.reproducctores.album_elegido.album_elegido');
+// })->name('reproductor-album');
+// Route::get('/reproductor-album1', function () {
+//     return view('musicoterapia.reproducctores.album_elegido.dormir.album_elegido1');
+// })->name('reproductor-album1');
+
+// Route::get('/reproductor-album2', function () {
+//     return view('musicoterapia.reproducctores.album_elegido.relajarse.album_elegido2');
+// })->name('reproductor-album2');
+// Route::get('/reproductor-album3', function () {
+//     return view('musicoterapia.reproducctores.album_elegido.concentrarse.album_elegido3');
+// })->name('reproductor-album3');
+
+// Route::get('/reproductor-album4', function () {
+//     return view('musicoterapia.reproducctores.album_elegido.gamer.album_elegido4');
+// })->name('reproductor-album4');
+// // })->name('reproductor-genero5');
 
 
 // RUTAS FOOTER
@@ -73,6 +156,13 @@ Route::get('/header1', function () {
 })->name('header1');
 
 
+
+
+
+
+
+
+
 // RUTAS MUSICOTERAPIA
 Route::get('/me-gusta', function () {
     return view('musicoterapia.megusta.megusta');
@@ -109,47 +199,22 @@ Route::get('/binaurales', function () {
     return view('musicoterapia.sonidos_binaurales.binaurales');
 })->name('binaurales');
 
-// RUTAS REPRODUCTORES
-//  REPRODUCCTORES ALBUM
-Route::get('/reproductor-album', function () {
-    return view('musicoterapia.reproducctores.album_elegido.album_elegido');
-})->name('reproductor-album');
-Route::get('/reproductor-album1', function () {
-    return view('musicoterapia.reproducctores.album_elegido.dormir.album_elegido1');
-})->name('reproductor-album1');
 
-Route::get('/reproductor-album2', function () {
-    return view('musicoterapia.reproducctores.album_elegido.relajarse.album_elegido2');
-})->name('reproductor-album2');
-Route::get('/reproductor-album3', function () {
-    return view('musicoterapia.reproducctores.album_elegido.concentrarse.album_elegido3');
-})->name('reproductor-album3');
 
-Route::get('/reproductor-album4', function () {
-    return view('musicoterapia.reproducctores.album_elegido.gamer.album_elegido4');
-})->name('reproductor-album4');
 
-//  REPRODUCCTORES GENEROS
-Route::get('/reproductor-genero', function () {
-    return view('musicoterapia.reproducctores.genero_elegido.genero_elegido');
-})->name('reproductor-genero');
-Route::get('/reproductor-genero1', function () {
-    return view('musicoterapia.reproducctores.genero_elegido.clasica.genero_elegido1');
-})->name('reproductor-genero1');
-Route::get('/reproductor-genero2', function () {
-    return view('musicoterapia.reproducctores.genero_elegido.ambiental.genero_elegido2');
-})->name('reproductor-genero2');
-Route::get('/reproductor-genero4', function () {
-    return view('musicoterapia.reproducctores.genero_elegido.electronica.genero_elegido4');
-})->name('reproductor-genero4');
-Route::get('/reproductor-genero5', function () {
-    return view('musicoterapia.reproducctores.genero_elegido.instrumental.genero_elegido5');
-})->name('reproductor-genero5');
 
-// REPRODUCTOR SONIDOS BINAURALES
-Route::get('/reproductor-binaural', function () {
-    return view('musicoterapia.reproducctores.repro_binaurales.Reproducctor2');
-})->name('reproductor-binaural');
+
+
+
+
+
+
+
+
+// // REPRODUCTOR SONIDOS BINAURALES
+// Route::get('/reproductor-binaural', function () {
+//     return view('musicoterapia.reproducctores.repro_binaurales.Reproducctor2');
+// })->name('reproductor-binaural');
 
 // REPRPRODUCTOR BUSQUEDA
 Route::get('/reproductor-busqueda', function () {

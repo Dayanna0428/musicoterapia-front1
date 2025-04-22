@@ -4,21 +4,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+
   {{-- Iconos --}}
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  
+
   {{-- Estilos --}}
   <link rel="stylesheet" href="{{ asset('css/musicoterapia.css/Header/style copy.css') }}">
   <link rel="stylesheet" href="{{ asset('css/musicoterapia.css/PRINCIPAL_BUSCAR/style.css') }}">
 
   <style>
     body {
-      background-image: 
-        linear-gradient(rgba(240, 230, 255, 0.85), rgba(240, 230, 255, 0.85)), 
+      background-image:
+        linear-gradient(rgba(240, 230, 255, 0.85), rgba(240, 230, 255, 0.85)),
         url('{{ asset('image/images/fondo_principal 2 abastrato.png') }}');
       background-size: cover;
       background-position: center;
@@ -91,7 +91,7 @@
           <span>Sonidos Binaurales</span>
         </a>
       </div>
-      
+
       <div class="menu-item {{ request()->routeIs('playlist') ? 'active' : '' }}">
         <a href="{{ route('playlist') }}">
           <img src="{{ asset('image/images/playL.png') }}" alt="Icon" />
@@ -114,36 +114,26 @@
       </div>
     </aside>
 
-    <main class="main-content">
-      <div class="title">
-        <span>Búsqueda</span>
-        <br><br>
-      </div>
-
-      <div class="content">
-        <div class="search-bar">
-          <img src="{{ asset('image/img/buscar.png') }}" alt="Ícono de búsqueda">
-          <input type="text" placeholder="Buscar pistas, álbumes, etc." aria-label="Buscar contenido">
+    <main class="main-content" style="max-width: 1200px; margin: 0 auto;">
+        <div class="title">
+          <span>Buscar Audios</span>
         </div>
-        <br>
 
         <div class="image-container">
-          <img id="carousel-image"  src="{{ asset('image/images/GENERO CARRUSEL 1.png') }}" alt="Carrusel de géneros" />
-          <img id="carousel-image"  src="{{ asset('image/images/ALBUM CARRUSEL.png') }}" alt="Carrusel albums" />
-        </div>
-       
-        <div class="recently">Resultados</div>
-
-        <!-- Contenedor de pistas -->
-        <div class="image-container2">
-          <div class="content">
-            <div class="tracks-container" id="tracks-container">
-              <p>Cargando resultados...</p>
-            </div>
+            <img id="carousel-image"  src="{{ asset('image/images/GENERO CARRUSEL 1.png') }}" alt="Carrusel de géneros" />
+            <img id="carousel-image"  src="{{ asset('image/images/ALBUM CARRUSEL.png') }}" alt="Carrusel albums" />
           </div>
+
+        <div class="search-bar">
+          <input type="text" id="search-input" placeholder="Buscar por título o palabra clave..." />
+          <button id="search-button"><i class="fas fa-search"></i></button>
         </div>
-      </div>
-    </main>
+
+        <div class="search-results" id="search-results">
+          <!-- Resultados de búsqueda aparecerán aquí -->
+        </div>
+      </main>
+
   </div>
 
   <br><br><br><br>
@@ -151,20 +141,135 @@
   {{-- Footer --}}
   @include('musicoterapia.Fotter.inicio.footer')
 
-  {{-- Scripts --}}
-  <script>
-    const images = [
-      { src:"{{ asset('image/images/GENERO CARRUSEL 1.png') }}", link: "/musicoterapia/Vistas1.1/PRINCIPAL_GENEROS/principal_generos.html", alt: "Carrusel de géneros" },
-      { src:"{{ asset('image/images/ALBUM CARRUSEL.png') }}", link:"{{ route('album') }}", alt: "Carrusel de álbumes" },
-      { src: "{{ asset('image/images/PODCASTS CARRUSEL.png') }}", link: "/musicoterapia/Vistas1.1/PRINCIPAL_PODCAST/principal_podcast.html", alt: "Carrusel de podcasts" },
-      { src: "{{ asset('image/images/BINAURAL CARRUSEL 2.png') }}", link: "/musicoterapia/Vistas1.1/SONIDOS_BINAURALES/binaurales.html", alt: "Carrusel de sonidos binaurales" }
-    ];
-  </script>
-  <script>
-    const reproductorBusquedaUrl = "{{ route('reproductor-busqueda') }}";
-</script>
+  <script src="{{ asset('js/api.js') }}"></script>
 
-  <script src="{{ asset('js/musicoterapia.js/PRINCIPAL BUSCAR/script.js') }}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const api = new API();
+    const searchInput = document.getElementById('search-input');
+    const searchButton = document.getElementById('search-button');
+    const resultsContainer = document.getElementById('search-results');
+
+    async function buscarAudios() {
+      const query = searchInput.value.trim().toLowerCase();
+      if (!query) {
+        resultsContainer.innerHTML = '<p>Ingresa un término para buscar.</p>';
+        return;
+      }
+
+      try {
+        const response = await api.getAllAudios();
+
+        if (!response.data || !Array.isArray(response.data)) {
+          throw new Error('Error de formato en los datos de la API');
+        }
+
+        const audios = response.data.filter(audio =>
+          audio.title?.toLowerCase().includes(query) ||
+          audio.description?.toLowerCase().includes(query)
+        );
+
+        if (audios.length === 0) {
+          resultsContainer.innerHTML = '<p>No se encontraron resultados.</p>';
+          return;
+        }
+
+        resultsContainer.innerHTML = audios.map(audio => `
+          <div class="audio-card">
+            <h3>${audio.title}</h3>
+            ${audio.description ? `<p>${audio.description}</p>` : ''}
+            <p><strong>Duración:</strong> ${formatDuration(audio.duration)}</p>
+            ${audio.frecuencia ? `<p><strong>Frecuencia:</strong> ${audio.frecuencia}Hz</p>` : ''}
+            <button onclick="window.location.href='/reproductor-binaural/${audio.id}'">
+              Reproducir
+            </button>
+          </div>
+        `).join('');
+      } catch (error) {
+        resultsContainer.innerHTML = `<p class="error">Error al buscar audios: ${error.message}</p>`;
+      }
+    }
+
+    function formatDuration(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${minutes}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    searchButton.addEventListener('click', buscarAudios);
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') buscarAudios();
+    });
+  });
+</script>
+<style>
+    .search-bar {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+.search-bar button {
+  padding: 10px 20px;
+  border: none;
+  background-color: #6a5acd;
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.audio-card {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.audio-card button {
+  align-self: flex-end; /* Alinea el botón a la derecha */
+  padding: 12px 25px;
+  border: none;
+  background: linear-gradient(45deg, #6a5acd, #8360c3); /* Degradado atractivo */
+  color: white;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 18px;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.audio-card button:hover {
+  background: linear-gradient(45deg, #8360c3, #6a5acd); /* Cambio de color en hover */
+  transform: scale(1.05); /* Efecto de zoom */
+}
+
+.audio-card button:focus {
+  outline: none;
+}
+
+</style>
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
