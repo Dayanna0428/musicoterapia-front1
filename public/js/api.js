@@ -260,6 +260,20 @@ class API {
     async getUserLikes() {
         return this._fetch('/likes/user');
     }
+
+    async getUserLikes() {
+        return this._fetch('/likes/user');
+    }
+
+    async toggleLike(audioId) {
+        return this._fetch(`/likes/toggle/${audioId}`, {
+            method: 'POST'
+        });
+    }
+    
+    async getLikedAudios() {
+        return this._fetch('/audios/liked');
+    }
 }
 
 // Instancia global
