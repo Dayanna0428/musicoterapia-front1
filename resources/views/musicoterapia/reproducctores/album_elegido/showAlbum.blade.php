@@ -8,19 +8,110 @@
     <link rel="stylesheet" href="{{ asset('css/musicoterapia.css/Header/style copy.css') }}">
     <link rel="stylesheet" href="{{ asset('css/musicoterapia.css/REPRODUCCTORES/ALBUM_ELEGIDO/style.css') }}">
     <style>
-      body {
-        background-image:
-          linear-gradient(rgba(240, 230, 255, 0.8), rgba(240, 230, 255, 0.8)),
-          url('/image/imagenes/fondo_principal1abastrato.png');
-        background-size: cover;
-        background-position: center center;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-        margin: 0;
-        padding: 0;
-        min-height: 100vh;
-      }
-    </style>
+        body {
+          background-image:
+            linear-gradient(rgba(240, 230, 255, 0.8), rgba(240, 230, 255, 0.8)),
+            url('/image/imagenes/fondo_principal1abastrato.png');
+          background-size: cover;
+          background-position: center center;
+          background-repeat: no-repeat;
+          background-attachment: fixed;
+          margin: 0;
+          padding: 0;
+          min-height: 100vh;
+        }
+
+        /* Estilos mejorados para el dropdown */
+        .dropdown {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 200px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1000;
+            border-radius: 8px;
+            padding: 8px 0;
+            right: 10px;
+        }
+
+        .dropdown.show {
+            display: block;
+        }
+
+        .dropdown-content {
+            padding: 10px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            color: #333;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-content:hover {
+            background-color: #f5f5f5;
+        }
+
+        .dropdown-content i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Estilos para el dropdown de playlists */
+        .playlists-dropdown {
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            background-color: #f9f9f9;
+        }
+
+        .playlists-dropdown.show {
+            display: block;
+        }
+
+        .playlist-option {
+            padding: 8px 16px 8px 32px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .playlist-option:hover {
+            background-color: #f0f0f0;
+        }
+
+        .playlist-option i {
+            margin-right: 8px;
+        }
+
+        .create-playlist-option {
+            color: #59009a;
+            font-weight: bold;
+            border-top: 1px solid #eee;
+            margin-top: 5px;
+            padding-top: 10px;
+        }
+
+        .dropdown-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #333;
+            padding: 5px 10px;
+        }
+
+        .actions {
+            position: relative;
+        }
+
+        .loading-playlists {
+            padding: 10px;
+            text-align: center;
+            color: #666;
+        }
+      </style>
     <title>tranquilidad</title>
     <script>
       async function includeHTML() {
@@ -136,16 +227,19 @@
               <button id="next-btn">▶▶</button>
             </div>
             <div class="actions">
-              <div><span class="me-gusta">❤</span></div>
-              <button class="dropdown-button">⋮</button>
-              <div id="dropdown" class="dropdown">
-                <!-- Only playlists will be shown here -->
-              </div>
-              <div id="create-playlist-form" class="playlist-form" style="display: none;">
-                <input type="text" id="playlist-name" placeholder="Nombre de la playlist">
-                <input type="text" id="playlist-description" placeholder="Descripción de la playlist">
-                <button id="create-playlist-btn">Aceptar</button> <!-- Removed inline onclick -->
-              </div>
+                <div><span class="me-gusta">❤</span></div>
+                <button class="dropdown-button">⋮</button>
+                <div id="dropdown" class="dropdown">
+                    <div class="dropdown-content" onclick="showAddToPlaylist()">
+                        <i class="fas fa-plus"></i> Añadir a playlist
+                    </div>
+                    <div class="dropdown-content" onclick="showHorizontalList()">
+                        <i class="fas fa-share-alt"></i> Compartir
+                    </div>
+                    <div id="playlists-dropdown" class="playlists-dropdown">
+                        <!-- Las playlists se cargarán aquí dinámicamente -->
+                    </div>
+                </div>
             </div>
             <div id="horizontal-list" class="horizontal-list">
               <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" />
@@ -168,8 +262,8 @@
   <script src="{{ asset('js/api.js') }}"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
-      // Verificar elementos críticos
-      const requiredElements = {
+      // Elementos del DOM
+      const elements = {
         albumTitle: document.getElementById('titulo-album'),
         albumImage: document.getElementById('album-image'),
         audioTitle: document.getElementById('audio-title'),
@@ -178,44 +272,63 @@
         currentTime: document.getElementById('current-time'),
         totalDuration: document.getElementById('total-duration'),
         playPauseBtn: document.getElementById('play-pause-btn'),
-        audioElement: document.getElementById('audio')
+        audioElement: document.getElementById('audio'),
+        dropdown: document.getElementById('dropdown'),
+        playlistsDropdown: document.getElementById('playlists-dropdown'),
+        dropdownButton: document.querySelector('.dropdown-button'),
+        horizontalList: document.getElementById('horizontal-list'),
+        tracksList: document.getElementById('tracks-list')
       };
 
-      // Validar elementos esenciales
-      for (const [key, element] of Object.entries(requiredElements)) {
-        if (!element) {
-          console.error(`Elemento crítico no encontrado: ${key}`);
-          return;
-        }
-      }
-
+      // Variables de estado
       const api = new API();
       const albumId = window.location.pathname.split('/').pop();
       let currentTrackIndex = 0;
       let tracks = [];
+      let currentAudio = null;
 
-      try {
-        // Cargar datos del álbum
-        const albumResponse = await api.getAlbum(albumId);
-        const album = albumResponse.data;
-        requiredElements.albumTitle.textContent = album.title;
-        requiredElements.albumImage.src = album.image_path || '{{ asset("image/images/default-album.png") }}';
+      // Inicialización
+      init();
 
-        // Cargar pistas del álbum
-        const audioResponse = await api.getAllAudios();
-        tracks = audioResponse.data.filter(audio => audio.album_id == albumId);
+      async function init() {
+        try {
+          // Cargar datos del álbum
+          const albumResponse = await api.getAlbum(albumId);
+          const album = albumResponse.data;
+          elements.albumTitle.textContent = album.title;
+          elements.albumImage.src = album.image_path || '{{ asset("image/images/default-album.png") }}';
 
-        if (tracks.length === 0) {
-          document.getElementById('tracks-list').innerHTML = `
-            <div class="empty-message">
-              <i class="fas fa-music"></i>
-              <p>No hay pistas en este álbum</p>
+          // Cargar pistas del álbum
+          const audioResponse = await api.getAllAudios();
+          tracks = audioResponse.data.filter(audio => audio.album_id == albumId);
+
+          if (tracks.length === 0) {
+            elements.tracksList.innerHTML = `
+              <div class="empty-message">
+                <i class="fas fa-music"></i>
+                <p>No hay pistas en este álbum</p>
+              </div>`;
+            return;
+          }
+
+          // Renderizar pistas
+          renderTracks();
+
+          // Configurar eventos
+          setupEventListeners();
+
+        } catch (error) {
+          console.error('Error:', error);
+          elements.tracksList.innerHTML = `
+            <div class="error-message">
+              <i class="fas fa-exclamation-triangle"></i>
+              <p>Error cargando el álbum</p>
             </div>`;
-          return;
         }
+      }
 
-        // Renderizar pistas
-        const tracksHTML = tracks.map((track, index) => `
+      function renderTracks() {
+        elements.tracksList.innerHTML = tracks.map((track, index) => `
           <div class="track" data-index="${index}">
             <div class="track-info">
               <span class="track-title">${track.title}</span>
@@ -227,69 +340,170 @@
             </button>
           </div>
         `).join('');
-
-        document.getElementById('tracks-list').innerHTML = tracksHTML;
-
-        // Configurar eventos del reproductor
-        setupPlayerControls();
-        setupTrackClicks();
-
-      } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('tracks-list').innerHTML = `
-          <div class="error-message">
-            <i class="fas fa-exclamation-triangle"></i>
-            <p>Error cargando el álbum</p>
-          </div>`;
       }
 
-      function formatDuration(seconds) {
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins}:${secs.toString().padStart(2, '0')}`;
-      }
+      function setupEventListeners() {
+        // Eventos del reproductor
+        elements.playPauseBtn.addEventListener('click', togglePlay);
+        elements.audioElement.addEventListener('timeupdate', updateProgress);
+        elements.progressBar.addEventListener('input', seek);
 
-      function setupPlayerControls() {
-        // Botón Play/Pause
-        requiredElements.playPauseBtn.addEventListener('click', () => {
-          if (requiredElements.audioElement.paused) {
-            requiredElements.audioElement.play();
-            requiredElements.playPauseBtn.textContent = '⏸';
-          } else {
-            requiredElements.audioElement.pause();
-            requiredElements.playPauseBtn.textContent = '▶';
-          }
-        });
-
-        // Barra de progreso
-        requiredElements.audioElement.addEventListener('timeupdate', () => {
-          const progress = (requiredElements.audioElement.currentTime / requiredElements.audioElement.duration) * 100;
-          requiredElements.progressBar.value = progress;
-          requiredElements.currentTime.textContent =
-            formatTime(requiredElements.audioElement.currentTime);
-        });
-
-        requiredElements.progressBar.addEventListener('input', (e) => {
-          const time = (e.target.value / 100) * requiredElements.audioElement.duration;
-          requiredElements.audioElement.currentTime = time;
-        });
-      }
-
-      function setupTrackClicks() {
+        // Eventos de las pistas
         document.querySelectorAll('.play-btn').forEach((btn, index) => {
           btn.addEventListener('click', () => {
             currentTrackIndex = index;
             loadTrack(tracks[index]);
           });
         });
+
+        // Eventos del dropdown
+        elements.dropdownButton.addEventListener('click', toggleMainDropdown);
+        document.addEventListener('click', handleDocumentClick);
+      }
+
+      // Funciones del reproductor
+      function togglePlay() {
+        if (elements.audioElement.paused) {
+          if (!elements.audioElement.src && tracks.length > 0) {
+            loadTrack(tracks[0]);
+          } else {
+            elements.audioElement.play();
+          }
+          elements.playPauseBtn.textContent = '⏸';
+        } else {
+          elements.audioElement.pause();
+          elements.playPauseBtn.textContent = '▶';
+        }
       }
 
       function loadTrack(track) {
-        requiredElements.audioElement.src = track.audio_file;
-        requiredElements.audioTitle.textContent = track.title;
-        requiredElements.audioArtist.textContent = track.artist || 'Artista desconocido';
-        requiredElements.audioElement.play();
-        requiredElements.playPauseBtn.textContent = '⏸';
+        currentAudio = track;
+        elements.audioElement.src = track.audio_file;
+        elements.audioTitle.textContent = track.title;
+        elements.audioArtist.textContent = track.artist || 'Artista desconocido';
+        elements.audioElement.play();
+        elements.playPauseBtn.textContent = '⏸';
+
+        // Resaltar la pista actual
+        document.querySelectorAll('.track').forEach((t, i) => {
+          t.classList.toggle('active', i === currentTrackIndex);
+          const playBtn = t.querySelector('.play-btn');
+          if (playBtn) {
+            playBtn.innerHTML = i === currentTrackIndex ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
+          }
+        });
+      }
+
+      function updateProgress() {
+        const progress = (elements.audioElement.currentTime / elements.audioElement.duration) * 100;
+        elements.progressBar.value = progress;
+        elements.currentTime.textContent = formatTime(elements.audioElement.currentTime);
+      }
+
+      function seek(e) {
+        const time = (e.target.value / 100) * elements.audioElement.duration;
+        elements.audioElement.currentTime = time;
+      }
+
+      // Funciones del dropdown
+      function toggleMainDropdown(e) {
+        e.stopPropagation();
+        elements.dropdown.classList.toggle('show');
+        elements.playlistsDropdown.classList.remove('show');
+        elements.horizontalList.style.display = 'none';
+      }
+
+      function handleDocumentClick(e) {
+        if (!e.target.closest('.dropdown') && !e.target.classList.contains('dropdown-button')) {
+          elements.dropdown.classList.remove('show');
+          elements.playlistsDropdown.classList.remove('show');
+          elements.horizontalList.style.display = 'none';
+        }
+      }
+
+      // Funciones globales para playlists
+      window.showAddToPlaylist = async function() {
+        try {
+          elements.playlistsDropdown.innerHTML = `
+            <div class="loading-playlists">
+              <i class="fas fa-spinner fa-spin"></i> Cargando playlists...
+            </div>`;
+
+          const response = await api.getUserPlaylists();
+          const playlists = response.data;
+
+          if (playlists.length === 0) {
+            elements.playlistsDropdown.innerHTML = `
+              <div class="playlist-option create-playlist-option" onclick="createNewPlaylist()">
+                <i class="fas fa-plus-circle"></i> Crear nueva playlist
+              </div>`;
+          } else {
+            elements.playlistsDropdown.innerHTML = playlists.map(playlist => `
+              <div class="playlist-option" onclick="addToPlaylist('${playlist.id}')">
+                <i class="fas fa-music"></i> ${playlist.name}
+              </div>
+            `).join('') + `
+              <div class="playlist-option create-playlist-option" onclick="createNewPlaylist()">
+                <i class="fas fa-plus-circle"></i> Crear nueva playlist
+              </div>`;
+          }
+
+          elements.playlistsDropdown.classList.add('show');
+        } catch (error) {
+          console.error('Error cargando playlists:', error);
+          alert('Error al cargar playlists');
+        }
+      };
+
+      window.addToPlaylist = async function(playlistId) {
+        if (!currentAudio) {
+          alert('Selecciona un audio primero');
+          return;
+        }
+
+        try {
+          await api.addAudioToPlaylist(playlistId, currentAudio.id);
+          alert('Audio añadido a la playlist');
+          elements.playlistsDropdown.classList.remove('show');
+          elements.dropdown.classList.remove('show');
+        } catch (error) {
+          console.error('Error añadiendo a playlist:', error);
+          alert('Error al añadir a playlist: ' + (error.message || ''));
+        }
+      };
+
+      window.createNewPlaylist = async function() {
+        const name = prompt('Nombre de la nueva playlist:');
+        if (!name) return;
+
+        const description = prompt('Descripción (opcional):') || '';
+
+        try {
+          await api.createPlaylist({ name, description });
+          alert('Playlist creada! Ahora puedes añadir el audio');
+          showAddToPlaylist(); // Recargar la lista
+        } catch (error) {
+          console.error('Error creando playlist:', error);
+          alert('Error al crear playlist: ' + (error.message || ''));
+        }
+      };
+
+      window.showHorizontalList = function() {
+        elements.horizontalList.style.display = 'flex';
+        elements.dropdown.classList.remove('show');
+      };
+
+      window.copyLink = function() {
+        navigator.clipboard.writeText(window.location.href)
+          .then(() => alert('Enlace copiado al portapapeles'))
+          .catch(err => console.error('Error al copiar:', err));
+      };
+
+      // Funciones de utilidad
+      function formatDuration(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
       }
 
       function formatTime(seconds) {
@@ -299,5 +513,23 @@
       }
     });
   </script>
+
+<style>
+    .me-gusta {
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #ccc;
+    transition: all 0.3s ease;
+    margin-right: 15px;
+}
+
+.me-gusta.active {
+    color: #ff0000;
+}
+
+.me-gusta:hover {
+    transform: scale(1.1);
+}
+</style>
 </body>
 </html>

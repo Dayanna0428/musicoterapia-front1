@@ -254,6 +254,29 @@ class API {
         });
     }
 
+
+
+    async getUserPlaylists() {
+        return this._fetch('/playlists');
+      }
+
+      async addAudioToPlaylist(playlistId, audioId) {
+        return this._fetch(`/playlists/${playlistId}/audios`, {
+          method: 'POST',
+          body: JSON.stringify({ audio_id: audioId })
+        });
+      }
+
+      async createPlaylist(data) {
+        return this._fetch('/playlists', {
+          method: 'POST',
+          body: JSON.stringify(data)
+        });
+      }
+
+
+
+
     // ==================== Likes ====================
     async toggleLike(audioId) {
         return this._fetch(`/likes/toggle/${audioId}`, {
@@ -273,14 +296,25 @@ class API {
         return this._fetch('/likes/user');
     }
 
+    // async toggleLike(audioId) {
+    //     return this._fetch(`/likes/toggle/${audioId}`, {
+    //         method: 'POST'
+    //     });
+    // }
+
+    async getLikedAudios() {
+        return this._fetch('/audios/liked');
+    }
+
+    // Likes
     async toggleLike(audioId) {
         return this._fetch(`/likes/toggle/${audioId}`, {
             method: 'POST'
         });
     }
 
-    async getLikedAudios() {
-        return this._fetch('/audios/liked');
+    async checkLike(audioId) {
+        return this._fetch(`/likes/check/${audioId}`);
     }
 }
 
