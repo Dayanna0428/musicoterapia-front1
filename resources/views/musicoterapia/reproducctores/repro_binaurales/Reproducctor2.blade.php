@@ -143,12 +143,25 @@
                     <span id="total-duration">0:00</span>
                 </div>
                 <div class="controls">
+                  <button id="prev-btn">◀◀</button>
                     <button id="play-pause-btn">▶</button>
+                    <button id="next-btn">▶▶</button>
+                </div>
+                <div class="actions">
+                  <div><span class="me-gusta">❤</span></div>
+                  <button class="dropdown-button">⋮</button>
+                  <div id="dropdown" class="dropdown">
+                    <!-- Only playlists will be shown here -->
+                  </div>
+                  <div id="create-playlist-form" class="playlist-form" style="display: none;">
+                    <input type="text" id="playlist-name" placeholder="Nombre de la playlist">
+                    <input type="text" id="playlist-description" placeholder="Descripción de la playlist">
+                    <button id="create-playlist-btn">Aceptar</button> <!-- Removed inline onclick -->
+                  </div>
                 </div>
             </div>
-
-            <!-- Sección de información adicional -->
-            <div class="binaural-info">
+            <div class="tracks-container" id="tracks-list">
+              <div class="binaural-info">
                 <h3 id="binaural-frequency"></h3>
                 <p id="binaural-description"></p>
                 <div class="binaural-effects">
@@ -162,6 +175,9 @@
                     </div>
                 </div>
             </div>
+            </div>
+            <!-- Sección de información adicional -->
+          
         </div>
 
         <audio id="audio"></audio>

@@ -431,7 +431,7 @@ a {
       left: 50%;
       transform: translate(-50%, -50%);
       width: auto;
-      background: white;
+      background: rgb(110, 11, 110);
       border-radius: 15px;
       box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
     }

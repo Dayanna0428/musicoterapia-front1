@@ -628,7 +628,7 @@ cursor: pointer;
     #progress-bar::-moz-range-thumb {
       width: 10px;
       height: 10px;
-      background: #ded8e2;
+      background: #59009A;
       border-radius: 50%;
       cursor: pointer;
     }
@@ -640,7 +640,7 @@ cursor: pointer;
 
     /* Cambiar color al arrastrar */
     #progress-bar:active::-webkit-slider-thumb {
-      background: #e1bee7;
+      background: #59009A;
     }
 
     .me-gusta.active {

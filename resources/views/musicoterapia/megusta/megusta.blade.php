@@ -274,13 +274,13 @@
     <style>
         .me-gusta {
     cursor: pointer;
-    color: #ccc;
+    color: #000000;
     transition: color 0.3s;
     margin-left: 15px;
 }
 
 .me-gusta.active {
-    color: #ff0000;
+    color:#59009A;
 }
 
 .track {

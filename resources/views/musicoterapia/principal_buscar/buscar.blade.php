@@ -115,6 +115,13 @@
     </aside>
 
     <main class="main-content" style="max-width: 1200px; margin: 0 auto;">
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+
         <div class="title">
           <span>Buscar Audios</span>
         </div>

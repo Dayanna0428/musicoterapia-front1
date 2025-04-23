@@ -518,13 +518,13 @@
     .me-gusta {
     cursor: pointer;
     font-size: 1.5rem;
-    color: #ccc;
+    color: #000000;
     transition: all 0.3s ease;
     margin-right: 15px;
 }
 
 .me-gusta.active {
-    color: #ff0000;
+    color: #59009A;
 }
 
 .me-gusta:hover {
