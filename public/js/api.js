@@ -166,6 +166,14 @@ class API {
         });
     }
 
+    async getPodcasts() {
+        return this._fetch('/podcasts');
+    }
+
+    async getSinglePodcast(podcastId) {
+        return this._fetch(`/podcasts/${podcastId}`);
+    }
+
     // ==================== Playlists ====================
     // Playlists CRUD
     async getAllPlaylists() {
@@ -270,7 +278,7 @@ class API {
             method: 'POST'
         });
     }
-    
+
     async getLikedAudios() {
         return this._fetch('/audios/liked');
     }

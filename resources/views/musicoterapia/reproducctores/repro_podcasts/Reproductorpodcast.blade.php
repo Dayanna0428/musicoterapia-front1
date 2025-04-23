@@ -10,18 +10,31 @@
  <link rel="stylesheet" href="{{ asset('css/musicoterapia.css/REPRODUCCTORES/REPRO_PODCAST\MOTIVACION/style.css') }}">
 
  <style>
-   body {
-     background-image:
-       linear-gradient(rgba(240, 230, 255, 0.85), rgba(240, 230, 255, 0.85)),
-       url('{{ asset('image/images/fondo_principal 2 abastrato.png') }}');
-     background-size: cover;
-     background-position: center;
-     background-repeat: no-repeat;
-     background-attachment: fixed;
-     margin: 0;
-     padding: 0;
-   }
- </style>
+    /* Nuevos estilos para video */
+    .video-container {
+        width: 80%;
+        max-width: 800px;
+        margin: 2rem auto;
+        background: #000;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    }
+
+    .episode-video {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 16/9;
+    }
+
+    .episodes-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+    }
+</style>
+
     <title>tranquilidad</title>
     <script>
       async function includeHTML() {
@@ -110,30 +123,18 @@
 
     <main class="main">
         <div class="podcast-header">
-          <h1 id="podcast-title">Podcast</h1>
+            <h1 id="podcast-title">Podcast</h1>
         </div>
 
         <div class="podcast-content">
-          <div class="player-container">
-            <div class="audio-player">
-              <audio id="audio-player" controls>
-                <source id="audio-source" type="audio/mpeg">
-                Tu navegador no soporta el elemento de audio.
-              </audio>
+            <div class="episodes-container" id="episodes-list">
+                <div class="loading-message">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Cargando podcast...</p>
+                </div>
             </div>
-
-            <div class="player-controls">
-              <button id="prev-button"><i class="fas fa-step-backward"></i></button>
-              <button id="play-button"><i class="fas fa-play"></i></button>
-              <button id="next-button"><i class="fas fa-step-forward"></i></button>
-            </div>
-          </div>
-
-          <div class="episodes-container" id="episodes-list">
-            <!-- Episodios se cargarán aquí -->
-          </div>
         </div>
-      </main>
+    </main>
   </div>
 
     </div>
@@ -144,140 +145,123 @@
     @include('musicoterapia.Fotter.inicio.footer')
 
     <script src="{{ asset('js/api.js') }}"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      const api = new API();
-      const podcastId = window.location.pathname.split('/').pop();
-      const player = document.getElementById('audio-player');
-      const playButton = document.getElementById('play-button');
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const api = new API();
+            const episodesList = document.getElementById('episodes-list');
+            const podcastTitle = document.getElementById('podcast-title');
 
-      // Elementos de la UI
-      const uiElements = {
-        title: document.getElementById('podcast-title'),
-        episodesList: document.getElementById('episodes-list')
-      };
+            // Obtener el ID del podcast de la URL
+            const podcastId = window.location.pathname.split('/').pop();
 
-      try {
-        // Obtener datos del podcast
-        const podcastResponse = await api.getPodcast(podcastId);
-        const podcast = podcastResponse.data;
+            try {
+                // Obtener el podcast específico
+                const response = await api.getPodcast(podcastId);
+                const podcast = response.data;
 
-        // Obtener episodios
-        const episodesResponse = await api.getPlaylistPodcasts(podcastId);
-        const episodes = episodesResponse.data;
+                // Actualizar el título
+                podcastTitle.textContent = podcast.title;
 
-        // Actualizar UI
-        uiElements.title.textContent = podcast.title;
+                // Mostrar solo este podcast
+                episodesList.innerHTML = `
+                    <div class="video-container">
+                        <video class="episode-video" controls poster="${podcast.image_file || ''}">
+                            <source src="${podcast.video_file}" type="video/mp4">
+                            Tu navegador no soporta videos HTML5
+                        </video>
+                        <div class="video-info">
+                            <h3>${podcast.title}</h3>
+                            ${podcast.description ? `<p>${podcast.description}</p>` : ''}
+                            <div class="video-meta">
+                                <span>Duración: ${formatDuration(podcast.duration)}</span>
+                                <span>Publicado: ${new Date(podcast.created_at).toLocaleDateString()}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
 
-        // Mostrar episodios
-        uiElements.episodesList.innerHTML = episodes.map((episode, index) => `
-          <div class="episode" data-episode-id="${episode.id}">
-            <div class="episode-number">${index + 1}</div>
-            <div class="episode-info">
-              <h4>${episode.title}</h4>
-              ${episode.description ? `<p>${episode.description}</p>` : ''}
-              <div class="episode-meta">
-                <span>${formatDuration(episode.duration)}</span>
-                <span>${new Date(episode.created_at).toLocaleDateString()}</span>
-              </div>
-            </div>
-            <button class="play-episode" data-src="${episode.audio_file}">
-              <i class="fas fa-play"></i>
-            </button>
-          </div>
-        `).join('');
-
-        // Controlador de eventos para reproducir episodios
-        document.querySelectorAll('.play-episode').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const audioSrc = btn.dataset.src;
-            player.src = audioSrc;
-            player.play();
-            playButton.innerHTML = '<i class="fas fa-pause"></i>';
-          });
+            } catch (error) {
+                console.error('Error:', error);
+                episodesList.innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Error cargando el podcast</p>
+                        <p>${error.message || ''}</p>
+                    </div>`;
+            }
         });
 
-        // Controladores del reproductor
-        playButton.addEventListener('click', () => {
-          if (player.paused) {
-            player.play();
-            playButton.innerHTML = '<i class="fas fa-pause"></i>';
-          } else {
-            player.pause();
-            playButton.innerHTML = '<i class="fas fa-play"></i>';
-          }
-        });
+        function formatDuration(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${minutes}:${secs.toString().padStart(2, '0')}`;
+        }
+    </script>
 
-        player.addEventListener('timeupdate', () => {
-          // Actualizar barra de progreso si la tienes
-        });
+    <style>
+        /* Estilos mejorados para el reproductor individual */
+        .video-container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 2rem auto;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
 
-      } catch (error) {
-        console.error('Error:', error);
-        alert('Error cargando el podcast');
-      }
-    });
+        .episode-video {
+            width: 100%;
+            height: auto;
+            min-height: 500px;
+            background: #000;
+        }
 
-    function formatDuration(seconds) {
-      const minutes = Math.floor(seconds / 60);
-      const secs = seconds % 60;
-      return `${minutes}:${secs.toString().padStart(2, '0')}`;
-    }
-  </script>
+        .video-info {
+            /* padding: 1.5rem; */
+            background: linear-gradient(to right, #2c0059, #4a0080);
+            color: white;
+        }
 
-  <style>
-    .podcast-content {
-    padding: 2rem;
-}
+        .video-info h3 {
+            margin: 0 0 1rem 0;
+            font-size: 1.5rem;
+            color: #fff;
+        }
 
-.audio-player {
-    width: 100%;
-    margin: 2rem 0;
-}
+        .video-info p {
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
 
-.player-controls {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    margin-top: 1rem;
-}
+        .video-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #ddd;
+        }
 
-.player-controls button {
-    font-size: 1.5rem;
-    padding: 1rem 2rem;
-    border: none;
-    background: #59009a;
-    color: white;
-    border-radius: 50px;
-    cursor: pointer;
-}
+        .video-meta span:first-child {
+            color: #ff9f00;
+        }
 
-.episodes-container {
-    margin-top: 3rem;
-}
+        @media (max-width: 768px) {
+            .video-container {
+                width: 95%;
+            }
 
-.episode {
-    display: flex;
-    align-items: center;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.9);
-    margin-bottom: 1rem;
-    border-radius: 10px;
-}
+            .episode-video {
+                min-height: 300px;
+            }
 
-.episode-number {
-    font-size: 1.2rem;
-    margin-right: 1rem;
-    color: #59009a;
-}
+            .video-info {
+                padding: 1rem;
+            }
 
-.play-episode {
-    margin-left: auto;
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-}
-  </style>
+            .video-info h3 {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
 <body>
 </html>
